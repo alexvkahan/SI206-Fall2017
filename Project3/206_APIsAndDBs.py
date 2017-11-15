@@ -1,9 +1,5 @@
 ## SI 206 2017
 ## Project 3
-## Building on HW7, HW8 (and some previous material!)
-
-##THIS STARTER CODE DOES NOT RUN!!
-
 
 ##OBJECTIVE:
 ## In this assignment you will be creating database and loading data 
@@ -19,12 +15,8 @@ import json
 import sqlite3
 
 ## Your name: Alex Kahan
-## The names of anyone you worked with on this project:
-
-#####
 
 ##### TWEEPY SETUP CODE:
-# Authentication information should be in a twitter_info file...
 consumer_key = twitter_info.consumer_key
 consumer_secret = twitter_info.consumer_secret
 access_token = twitter_info.access_token
@@ -32,11 +24,7 @@ access_token_secret = twitter_info.access_token_secret
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 
-# Set up library to grab stuff from twitter with your authentication, and 
-# return it in a JSON format 
 api = tweepy.API(auth, parser=tweepy.parsers.JSONParser())
-
-##### END TWEEPY SETUP CODE
 
 ## Task 1 - Gathering data
 
@@ -59,26 +47,26 @@ except:
 
 # Define your function get_user_tweets here:
 def get_user_tweets(keyword):
-	if keyword in cache_dict:
+	if keyword in cache_dict:  #Checks to see if tweet data for user is already in cache
 		print ('Using Cached Data')
-		tweets=cache_dict[keyword]
+		tweets=cache_dict[keyword]  #If so uses cached data
 	else:
 		print ('Fetching data from Twitter')
-		tweets=api.user_timeline(keyword)
-		cache_dict[keyword]=tweets
+		tweets=api.user_timeline(keyword) #Otherwise makes a request to the api for tweet data
+		cache_dict[keyword]=tweets 
 		cache_writer=open(CACHE_FNAME, 'w')
-		cache_writer.write(json.dumps(cache_dict))
+		cache_writer.write(json.dumps(cache_dict)) #Adds tweet data data to cache
 		cache_writer.close()
-	return (tweets)
+	return (tweets) #returns tweets data for entered user
 
 
 
 # Write an invocation to the function for the "umich" user timeline and 
 # save the result in a variable called umich_tweets:
-keyword=input('Enter user you would like to retrieve tweets from: ')
+keyword=input('Enter user you would like to retrieve tweets from: ') #Allows unput to seach for a user's tweets
 if len(keyword)<1:
-	keyword='umsi'
-umich_tweets=get_user_tweets(keyword)
+	keyword='umsi' #sets default value to 'umsi'
+umich_tweets=get_user_tweets(keyword) #invokes get_user_tweets and saves data to variable umich_tweets
 
 
 ## Task 2 - Creating database and loading data into database
@@ -91,51 +79,33 @@ umich_tweets=get_user_tweets(keyword)
 conn=sqlite3.connect('206_APIsAndDBs.sqlite')
 cur=conn.cursor()
 
-cur.execute('DROP Table if Exists Users')
+cur.execute('DROP Table if Exists Users') #overwrites tables
 cur.execute('DROP Table if Exists Tweets')
-cur.execute('''Create Table Users (user_id TEXT PRIMARY KEY UNIQUE, screenname VARCHAR, num_favs INTEGER, description VARCHAR)''')
+cur.execute('''Create Table Users (user_id TEXT PRIMARY KEY UNIQUE, screenname VARCHAR, num_favs INTEGER, description VARCHAR)''') #creates Users table
 
-cur.execute('''Create Table Tweets(tweet_id TEXT PRIMARY KEY UNIQUE, text VARCHAR, user_posted TEXT, time_posted TIMESTAMP, retweets INTEGER)''')
+cur.execute('''Create Table Tweets(tweet_id TEXT PRIMARY KEY UNIQUE, text VARCHAR, user_posted TEXT, time_posted TIMESTAMP, retweets INTEGER)''') #creates tweets table
 
 for tweet in umich_tweets:
 	tup=(tweet['id_str'], tweet['text'],tweet['user']['id_str'] ,tweet['created_at'], tweet['retweet_count'])
-	cur.execute('Insert into Tweets (tweet_id, text, user_posted, time_posted, retweets) Values (?,?,?,?,?)', tup,)
+	cur.execute('Insert into Tweets (tweet_id, text, user_posted, time_posted, retweets) Values (?,?,?,?,?)', tup,) #Adds tweet data into Tweet table
 conn.commit()
 
-user_dict={}
+user_dict={} #initializes a ditionary to store user data so that there are not duplicates when inserting user data into Users table
 
 for tweet in umich_tweets:
 	user=api.get_user(tweet['user']['screen_name'])
 	if user['name'] not in user_dict:
-		user_dict[user['name']]=user
+		user_dict[user['name']]=user #Adds the user who posted tweet into user_dict
 	for person in tweet['entities']['user_mentions']:
 		user=api.get_user(person['screen_name'])
 		if user['name'] not in user_dict:
-			user_dict[user['name']]=user
+			user_dict[user['name']]=user #Adds mentioned users into user_dict
 
 for user in user_dict.keys():
 	tup=(user_dict[user]['id_str'], user_dict[user]['screen_name'], user_dict[user]['favourites_count'], user_dict[user]['description'])
-	cur.execute('Insert into Users (user_id, screenname, num_favs, description) Values (?,?,?,?)', tup,)
+	cur.execute('Insert into Users (user_id, screenname, num_favs, description) Values (?,?,?,?)', tup,) #Adds user data into Users table
 
 conn.commit()
-
-
-## You should load into the Tweets table: 
-# Info about all the tweets (at least 20) that you gather from the 
-# umich timeline.
-# NOTE: Be careful that you have the correct user ID reference in 
-# the user_id column! See below hints.
-
-
-## HINT: There's a Tweepy method to get user info, so when you have a 
-## user id or screenname you can find alllll the info you want about 
-## the user.
-
-## HINT: The users mentioned in each tweet are included in the tweet 
-## dictionary -- you don't need to do any manipulation of the Tweet 
-## text to find out which they are! Do some nested data investigation 
-## on a dictionary that represents 1 tweet to see it!
-
 
 ## Task 3 - Making queries, saving data, fetching data
 
@@ -145,9 +115,9 @@ conn.commit()
 # Make a query to select all of the records in the Users database. 
 # Save the list of tuples in a variable called users_info.
 users_info = []
-rows=cur.execute('SELECT * FROM USERS')
+rows=cur.execute('SELECT * FROM USERS') 
 for row in rows:
-	users_info.append(row)
+	users_info.append(row) 
 
 # Make a query to select all of the user screen names from the database. 
 # Save a resulting list of strings (NOT tuples, the strings inside them!) 

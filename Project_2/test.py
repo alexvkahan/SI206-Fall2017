@@ -18,43 +18,50 @@ from urllib.request import urlopen
 ## requests.get(base_url, headers={'User-Agent': 'SI_CLASS'}) 
 
 def get_umsi_data():
-	umsi_titles={}
-	base_url='https://www.si.umich.edu/directory?field_person_firstname_value=&field_person_lastname_value=&rid=All'
+    umsi_titles={}
+    base_url='https://www.si.umich.edu/directory?field_person_firstname_value=&field_person_lastname_value=&rid=All'
 
-	x=0
-	while x<13:	
-		result=requests.get(base_url, headers={'User-Agent': 'SI_CLASS'})
-		soup=BeautifulSoup(result.content, 'html.parser')
-		directory=soup(class_='view-content')
-		for people in directory:
-			people=people(class_='views-row')
-			for person in people:
-				name=(person('h2'))[-1]
-				name=name.text
-				title=person(class_='field-item even')
-				title=(title[-1].text)
-				umsi_titles[name]=title
-		x+=1
-		pager=soup(class_='pager-next')
-		for page in pager:
-			href=page('a')
-			for link in href:
-				link=link.get('href', None)
-				if len(link)>0:
-					base_url='https://www.si.umich.edu'+link
-	
-	return (umsi_titles)
+    
+    while True: 
+        result=requests.get(base_url, headers={'User-Agent': 'SI_CLASS'})
+        soup=BeautifulSoup(result.content, 'html.parser')
+        directory=soup(class_='view-content')
+        for people in directory:
+            people=people(class_='views-row')
+            for person in people:
+                name=(person('h2'))[-1]
+                name=name.text
+                title=person(class_='field-item even')
+                title=(title[-1].text)
+                umsi_titles[name]=title
+                
+       
+        pager=soup(class_='pager-next')
+        for page in pager:
+            href=page('a')
+            for link in href:
+                link=link.get('href', None)
+                print (link)
+                if len(link)>0:
+                    base_url='https://www.si.umich.edu'+link
+                else:
+                	return (umsi_titles)
+
+                
+    
+		
 
 data=get_umsi_data()
-def num_students(data):
-	phd=0
-	for person in data.keys():
-		if data[person]=='PhD student':
-			phd+=1
-	return (phd)
+print (len(data))
+# def num_students(data):
+# 	phd=0
+# 	for person in data.keys():
+# 		if data[person]=='PhD student':
+# 			phd+=1
+# 	return (phd)
 
 
-num_students(data)
+# num_students(data)
     		
     	
     

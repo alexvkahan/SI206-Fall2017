@@ -11,6 +11,7 @@ url='http://py4e-data.dr-chuck.net/comments_38734.html'
 html=urlopen(url, context=ctx).read()
 
 soup=BeautifulSoup(html, 'html.parser')
+print(dir(soup))
 x=soup.find_all('span')
 
 total=0
@@ -19,5 +20,5 @@ for item in x:
 	for number in y:
 		number=int(number)
 		total+=number
-print (total)
+
 
