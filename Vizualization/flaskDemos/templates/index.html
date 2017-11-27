@@ -1,0 +1,16 @@
+<html>
+<head>
+   <title>Great Number Game</title>
+   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}?q=1280549785">
+</head>
+<body>
+  <h1>Welcome to the Great Number Game!</h1>
+  <p>Think of a number 1 - 100...see if you can guess it right!</p>
+  
+  <p class="answer">{{ answer }}</p>
+
+  <form action='/guess' method='post'>
+      Guess: <input type='text' name='guess'><br/>
+      <input type='submit' value='submit'>
+  </form>
+</body>
