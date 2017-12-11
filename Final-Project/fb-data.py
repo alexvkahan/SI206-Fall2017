@@ -29,8 +29,9 @@ def get_fb_data(user_id, access_token):
 		base_url='https://graph.facebook.com/v2.10/'+user_id+'/feed/'
 		url_params={}
 		url_params['access_token']=access_token
-		url_params['fields']='from, message, likes(summary=true), created_time, place'
+		url_params['fields']='from, message, likes, created_time, place'
 		r=requests.get(base_url,params=url_params)
+		print (r.summary)
 		posts=r.text
 		posts_dict=json.loads(posts)
 		for post in posts_dict['data']:
