@@ -1,44 +1,40 @@
+<!--This file is based on code from the py4e.com file where.html-->
+
 <html>
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <title>A Map of Information</title>
+    <title>A Map of Facebook Posts</title>
     <link href="https://google-developers.appspot.com/maps/documentation/javascript/examples/default.css" rel="stylesheet">
-
-    <!-- If you are in China, you may need to use theis site for the Google Maps code
-    <script src="https://maps.google.cn/maps/api/js" type="text/javascript"></script> -->
-    <!-- Note - you may need your own Google Maps API Key -->
+    
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyD2oomSZrhj3k9yT05vL5fvJYjNrQXPB9I"></script>
 
-
     <script src="https://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer_compiled.js"></script>
-    <script src="where.js"></script>
+    <script src="geodata.js"></script>
     <script>
 
       function initialize() {
-        alert("To see post information, hover over the marker but please don't click.");
-        var myLatlng = new google.maps.LatLng(37.39361,-122.099263)
+        alert("To see post information, hover over the marker but don't click.");
+        var myLatlng = new google.maps.LatLng(42.269117, -83.735959)
         var mapOptions = {
           zoom: 3,
           center: myLatlng,
           mapTypeId: google.maps.MapTypeId.ROADMAP
         }
         var map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
-
         i = 0;
         var markers = [];
-        for ( pos in myData ) {
+        for ( pos in Data ) {
             i = i + 1;
-            var row = myData[pos];
-		    window.console && console.log(row);
-            // if ( i < 3 ) { alert(row); }
-            var newLatlng = new google.maps.LatLng(row[0], row[1]);
-            var marker = new google.maps.Marker({
-                position: newLatlng,
-                map: map,
-                title: row[2]
-            });
-            markers.push(marker);
+            var row = Data[pos];
+		            window.console && console.log(row);
+                  var newLatlng = new google.maps.LatLng(row[0], row[1]);
+                  var marker = new google.maps.Marker({
+                  position: newLatlng,
+                  map: map,
+                  title: 'Message: '+row[2]+'\n'+'Likes: '+row[3]+'\n'+'Weather: '+row[4]+'\n'+ 'Site: '+ row[5]
+                  });
+                  markers.push(marker);
         }
       }
     </script>
